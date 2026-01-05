@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إمبراطورية الطيور</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --main-color: #f39c12; --bg-color: #2c3e50; }
+        body {
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #1a2a3a 0%, #2c3e50 100%);
+            color: white; overflow: hidden; display: flex; flex-direction: column; align-items: center;
+        }
+        .header { margin-top: 20px; text-align: center; }
+        .score-container {
+            background: rgba(0,0,0,0.3); padding: 10px 30px;
+            border-radius: 50px; border: 2px solid var(--main-color);
+            font-size: 24px; font-weight: bold; margin: 20px 0;
+        }
+        .game-area {
+            flex-grow: 1; display: flex; justify-content: center; align-items: center;
+            width: 100%; position: relative;
+        }
+        .bird-btn {
+            width: 200px; cursor: pointer; transition: transform 0.1s;
+            filter: drop-shadow(0 0 10px rgba(243, 156, 18, 0.5));
+        }
+        .bird-btn:active { transform: scale(0.9); }
+        
+        /* تأثير النقاط المتطايرة */
+        .plus-one {
+            position: absolute; color: var(--main-color);
+            font-weight: bold; font-size: 24px; animation: floatUp 1s forwards;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-100px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 id="user-name">تحميل...</h2>
+        <div class="score-container">
+            🥚 <span id="score">0</span>
+        </div>
+    </div>
+
+    <div class="game-area" id="click-area">
+        <div class="bird-btn" id="bird">
+            <span style="font-size: 120px;">🦅</span>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let score = 0;
+        const scoreElement = document.getElementById('score');
+        const birdElement = document.getElementById('bird');
+        const clickArea = document.getElementById('click-area');
+        const nameElement = document.getElementById('user-name');
+
+        // إظهار اسم المستخدم من تيليجرام
+        nameElement.innerText = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "لاعب مجهول";
+
+        birdElement.addEventListener('click', (e) => {
+            score++;
+            scoreElement.innerText = score;
+            
+            // اهتزاز خفيف للهاتف (يعمل في تيليجرام)
+            tg.HapticFeedback.impactOccurred('medium');
+
+            // إنشاء تأثير رقم +1
+            const plus = document.createElement('div');
+            plus.innerText = '+1';
+            plus.className = 'plus-one';
+            plus.style.left = e.clientX + 'px';
+            plus.style.top = e.clientY + 'px';
+            clickArea.appendChild(plus);
+
+            setTimeout(() => plus.remove(), 1000);
+        });
+    </script>
+</body>
+</html>
